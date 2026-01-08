@@ -16,48 +16,50 @@ def index():
 
 @app.route("/generate", methods=["POST"])
 def generate():
-    name = request.form.get("name")
-    school = request.form.get("school")
-    event = request.form.get("event")
-    email = request.form.get("email")
+    name = request.form["name"].strip()
+    school = request.form["school"].strip()
+    event = request.form["event"].strip()
+    email = request.form["email"].strip()
 
-    # 🔗 Google Apps Script URL
     GOOGLE_SCRIPT_URL = os.environ.get(
-        "GOOGLE_SHEET_URL",
-        "https://script.google.com/macros/s/AKfycbwTph_gvHOWdGdzqcpMNeK0_-FsW0agehn7ViJKyhyNHFbwh3BULZl2IBHn9wAUcCAu_Q/exec"
+        "https://docs.google.com/spreadsheets/d/1hlZopqrcHKu1asgkLDjTu-wA7DG4OFzJa-pisyaNacE/edit?gid=0#gid=0",
+        "https://script.google.com/u/2/home/projects/1H-RqmdPQ7L-f375PZPfSw9yHXOlvn5hQUZWVbaRXc2LERBy_enmLlEuv/edit"
     )
 
-    # 📤 Send data to Google Sheets
+    payload = {
+        "name": name,
+        "school": school,
+        "event": event,
+        "email": email,
+        "certificate_id": str(uuid.uuid4()),
+        "ip": request.remote_addr
+    }
+
     try:
-        requests.post(
+        response = requests.post(
             GOOGLE_SCRIPT_URL,
-            json={
-                "name": name,
-                "school": school,
-                "event": event,
-                "email": email
-            },
+            json=payload,
             timeout=5
         )
+        result = response.json()
     except Exception as e:
-        print("Google Sheets error:", e)
+        return "Server error. Please try again later.", 500
 
-    # 🎓 Load certificate template
-    img = Image.open("certificate.png").convert("RGB")
+    # 🚫 BLOCK certificate generation
+    if result.get("status") != "valid":
+        return (
+            "❌ Details do not match our records.<br>"
+            "Please check your Name, School, Event, and Email.",
+            403
+        )
+
+    # ✅ ONLY VALID USERS REACH HERE
+    img = Image.open("certificate.png")
     draw = ImageDraw.Draw(img)
+    font = ImageFont.truetype("Arial.ttf", 60)
 
-    # 🔤 Load font (fallback safe)
-    try:
-        font_big = ImageFont.truetype("Arial.ttf", 60)
-    except:
-        font_big = ImageFont.load_default()
+    draw.text((800, 600), name, fill="black", font=font)
 
-    # 🖊 Write name on certificate
-    text_x = 800
-    text_y = 600
-    draw.text((text_x, text_y), name, fill="black", font=font_big)
-
-    # 📄 Save as PDF
     filename = f"{uuid.uuid4()}.pdf"
     filepath = os.path.join(OUTPUT_DIR, filename)
     img.save(filepath, "PDF")

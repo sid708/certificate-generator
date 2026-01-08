@@ -23,7 +23,7 @@ def generate():
 
     GOOGLE_SCRIPT_URL = os.environ.get(
         "https://docs.google.com/spreadsheets/d/1hlZopqrcHKu1asgkLDjTu-wA7DG4OFzJa-pisyaNacE/edit?gid=0#gid=0",
-        "https://script.google.com/u/2/home/projects/1H-RqmdPQ7L-f375PZPfSw9yHXOlvn5hQUZWVbaRXc2LERBy_enmLlEuv/edit"
+        "https://script.google.com/macros/s/AKfycbz77GzOo1pBrGDKb2sQIFuZH4uBriVSJBwJha3iKFIgGu7-gezlyOm-pwLdl09dKFiuFQ/exec"
     )
 
     payload = {

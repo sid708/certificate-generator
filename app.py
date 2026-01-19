@@ -6,7 +6,6 @@ import requests
 
 app = Flask(__name__)
 
-# 📁 Output directory
 OUTPUT_DIR = "output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -21,10 +20,7 @@ def generate():
     event = request.form["event"].strip()
     email = request.form["email"].strip()
 
-    GOOGLE_SCRIPT_URL = os.environ.get(
-        "https://docs.google.com/spreadsheets/d/1hlZopqrcHKu1asgkLDjTu-wA7DG4OFzJa-pisyaNacE/edit?gid=0#gid=0",
-        "https://script.google.com/macros/s/AKfycbz77GzOo1pBrGDKb2sQIFuZH4uBriVSJBwJha3iKFIgGu7-gezlyOm-pwLdl09dKFiuFQ/exec"
-    )
+    GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxcc-wzbaB-eiu5mZWryc4iy6udJi7pO1f-ljrhkPdgU25C3aH0Nwj-krLdo1zYabRmeA/exec"
 
     payload = {
         "name": name,
@@ -36,16 +32,14 @@ def generate():
     }
 
     try:
-        response = requests.post(
-            GOOGLE_SCRIPT_URL,
-            json=payload,
-            timeout=5
-        )
+        response = requests.post(GOOGLE_SCRIPT_URL, json=payload, timeout=10)
+        print("Google Script Response:", response.text)  # debug log
         result = response.json()
     except Exception as e:
-        return "Server error. Please try again later.", 500
+        print("Error calling Google Script:", e)
+        return f"Server error: {e}", 500
 
-    # 🚫 BLOCK certificate generation
+    # Block invalid info
     if result.get("status") != "valid":
         return (
             "❌ Details do not match our records.<br>"
@@ -53,12 +47,17 @@ def generate():
             403
         )
 
-    # ✅ ONLY VALID USERS REACH HERE
+    # Generate certificate ONLY for valid info
     img = Image.open("certificate.png")
     draw = ImageDraw.Draw(img)
     font = ImageFont.truetype("Arial.ttf", 60)
+    bbox = draw.textbbox((0, 0), name, font=font)
+    text_width = bbox[2] - bbox[0]
+    text_height = bbox[3] - bbox[1]
+    x = (img.width - text_width) / 2
+    y = 600
+    draw.text((x, y), name, fill="black", font=font)
 
-    draw.text((800, 600), name, fill="black", font=font)
 
     filename = f"{uuid.uuid4()}.pdf"
     filepath = os.path.join(OUTPUT_DIR, filename)
@@ -66,7 +65,7 @@ def generate():
 
     return send_file(filepath, as_attachment=True)
 
-# ▶ Run server
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=True)
+    app.run(host="0.0.0.0", port=port)

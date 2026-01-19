@@ -1,0 +1,17 @@
+import requests
+
+url = "https://script.google.com/macros/s/AKfycbydhUOgR9wltuBTf_1tl6uJhtzbuUvidFr4ZhTj7LthQ8qF0HCa1BiBzuJ71y7F4BDHqA/exec"
+
+payload = {
+    "name": "Siddharth Nair",
+    "school": "Dr Pillai Global Academy, New Panvel",
+    "event": "robo racer",
+    "email": "sidnair708@gmail.com",
+    "certificate_id": "12345",
+    "ip": "127.0.0.1"
+}
+
+response = requests.post(url, json=payload)
+
+print("Status code:", response.status_code)
+print("Response text:", response.text)

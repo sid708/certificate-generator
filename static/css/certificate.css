@@ -1,0 +1,96 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #020617;
+  font-family: "Inter", sans-serif;
+}
+
+/* ===== CERTIFICATE BACKGROUND ===== */
+.certificate {
+  position: relative;
+  width: 1200px;
+  height: 850px;
+
+  /* 🔥 THIS IS THE IMPORTANT PART */
+.certificate {
+  width: 1200px;
+  height: 850px;
+
+  background-image: url("/static/bg.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  text-transform: uppercase;
+
+}
+
+  background-size: cover;
+
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.8);
+}
+
+/* ===== NAME ONLY ===== */
+.name {
+  position: absolute;
+
+  /* 👇 CHANGE THESE TO PERFECTLY ALIGN NAME */
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  font-size: 64px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-align: center;
+  white-space: nowrap;
+
+  background: linear-gradient(
+    120deg,
+    #00f0ff,
+    #ffffff,
+    #7dd3fc,
+    #00f0ff
+  );
+  background-size: 300% auto;
+
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+
+  animation: shimmer 3s linear infinite;
+
+  text-shadow:
+    0 0 20px rgba(56, 189, 248, 0.45),
+    0 0 40px rgba(56, 189, 248, 0.25);
+}
+
+/* ===== SHIMMER ===== */
+@keyframes shimmer {
+  from {
+    background-position: 0% center;
+  }
+  to {
+    background-position: 300% center;
+  }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1000px) {
+  .certificate {
+    transform: scale(0.8);
+  }
+
+  .name {
+    font-size: 50px;
+  }
+}
